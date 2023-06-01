@@ -1,0 +1,13 @@
+shed:
+  - code: CHNS
+    type: Chainsaw
+    brand: Stihl
+  - code: LADW
+    type: Ladder
+    brand: Werner
+  - code: JAKD
+    type: Jackhammer
+    brand: DeWalt
+  - code: JAKR
+    type: Jackhammer
+    brand: Ridgid
