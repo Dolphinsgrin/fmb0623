@@ -10,8 +10,17 @@ import java.util.List;
 public class Shed {
     private List<Tool> shed;
 
-    public List<Tool> getShed() {
+    public List<Tool> getTools() {
         return shed;
+    }
+
+    public Tool getTool(String code) {
+        for (Tool tool : shed) {
+            if (tool.getCode().equals(code)) {
+                return tool;
+            }
+        }
+        return null;
     }
 
     public void setShed(List<Tool> shed) {
