@@ -1,0 +1,16 @@
+schedule:
+  - type: Ladder
+    daily_charge: 1.99
+    charge_weekdays: true
+    charge_weekends: true
+    charge_holidays: false
+  - type: Chainsaw
+    daily_charge: 1.49
+    charge_weekdays: true
+    charge_weekends: false
+    charge_holidays: true
+  - type: Jackhammer
+    daily_charge: 2.99
+    charge_weekdays: true
+    charge_weekends: false
+    charge_holidays: false

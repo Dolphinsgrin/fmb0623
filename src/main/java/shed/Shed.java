@@ -1,38 +1,26 @@
 package shed;
 
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-
-import java.io.InputStream;
 import java.util.List;
 
 public class Shed {
+    public static final String FILE_NAME = "inventory.yaml";
     private List<Tool> shed;
 
     public List<Tool> getTools() {
         return shed;
     }
 
-    public Tool getTool(String code) {
+    public Tool getTool(String code) throws IllegalArgumentException {
         for (Tool tool : shed) {
             if (tool.getCode().equals(code)) {
                 return tool;
             }
         }
-        return null;
+        throw new IllegalArgumentException(String.format("unknown tool code [%s]", code));
     }
 
     public void setShed(List<Tool> shed) {
         this.shed = shed;
-    }
-
-    public static Shed InitShed() {
-        String inventoryFileName = "inventory.yaml";
-        Constructor constructor = new Constructor(Shed.class, new LoaderOptions());
-        Yaml yaml = new Yaml(constructor);
-        InputStream inputStream = Shed.class.getClassLoader().getResourceAsStream(inventoryFileName);
-        return yaml.load(inputStream);
     }
 
     @Override

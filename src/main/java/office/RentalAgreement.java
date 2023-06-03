@@ -1,5 +1,6 @@
 package office;
 
+import config.ConfigReader;
 import shed.Tool;
 
 import java.text.NumberFormat;
@@ -7,6 +8,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class RentalAgreement {
+    public static final String BAD_DISCOUNT_PERCENTAGE_MESSAGE = "the requested discount percentage (%d%%) must be between 0%% and 100%%";
+    public static final String BAD_RENTAL_DAYS_MESSAGE = "the number of requested rental days (%d) must be greater than 0";
     private final Tool tool;
     private final int rentalDays;
     private final LocalDate checkoutDate;
@@ -20,52 +23,49 @@ public class RentalAgreement {
     private double discountAmount;
     private double finalCharge;
 
-    public RentalAgreement(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) {
+    private static final ChargeSchedule chargeSchedule = ConfigReader.readConfig(ChargeSchedule.FILE_NAME, ChargeSchedule.class);
+    private static final NumberFormat numberFormatter = NumberFormat.getCurrencyInstance();
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+
+    public RentalAgreement(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException {
+        validateInputs(rentalDays, discountPercent);
         this.tool = tool;
         this.rentalDays = rentalDays;
         this.checkoutDate = checkoutDate;
         this.discountPercent = discountPercent;
-        crunchNumbers();
+        init();
+    }
+
+    private void validateInputs(int rentalDays, int discountPercent) throws IllegalArgumentException {
+        if (rentalDays < 1) {
+            throw new IllegalArgumentException(String.format(BAD_RENTAL_DAYS_MESSAGE, rentalDays));
+        }
+        if (discountPercent < 0 || discountPercent > 100) {
+            throw new IllegalArgumentException(String.format(BAD_DISCOUNT_PERCENTAGE_MESSAGE, discountPercent));
+        }
     }
 
     /***
      * The sequencing of the below actions are important. For example, attempting to calculate pre-discount charge
      * before calculating the charge days or the daily charge rate will result in bad data.
-     * TODO: group appropriately
      */
-    private void crunchNumbers() {
-        calcDueDate();
-        lookupRentalCharge();
-        calcDaysCharged();
-        calcPrediscountCharge();
-        calcDiscountAmount();
-        calcFinalCharge();
-    }
-
-    private void calcDueDate() {
+    private void init() {
         dueDate = checkoutDate.plusDays(rentalDays);
+        dailyRentalCharge = chargeSchedule.getCharges(tool.getType()).getDaily_charge();
+        calcDaysCharged();
+        prediscountCharge = daysCharged * dailyRentalCharge;
+        discountAmount = roundToTwoDecimal(prediscountCharge * (double)discountPercent / 100);
+        finalCharge = roundToTwoDecimal(prediscountCharge - discountAmount);
     }
 
-    private void lookupRentalCharge() {
-        // TODO: implement
-        dailyRentalCharge = 2;
+    private double roundToTwoDecimal(double value) {
+        // TODO: verify this rounds the half up
+        return (double) Math.round(value * 100.0) / 100.0;
     }
 
     private void calcDaysCharged() {
         // TODO: implement date screening
         daysCharged = rentalDays;
-    }
-
-    private void calcPrediscountCharge() {
-        prediscountCharge = daysCharged * dailyRentalCharge;
-    }
-
-    private void calcDiscountAmount() {
-        discountAmount = prediscountCharge * (double)discountPercent / 100;
-    }
-
-    private void calcFinalCharge() {
-        finalCharge = prediscountCharge - discountAmount;
     }
 
     public Tool getTool() {
@@ -109,8 +109,6 @@ public class RentalAgreement {
     }
 
     public void printAgreement() {
-        NumberFormat numberFormatter = NumberFormat.getCurrencyInstance();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
         String sb = "Tool code: " + tool.getCode() + "\n" +
                 "Tool type: " + tool.getType() + "\n" +
                 "Tool brand: " + tool.getBrand() + "\n" +

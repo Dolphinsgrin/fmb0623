@@ -1,5 +1,6 @@
 package shed;
 
+import config.ConfigReader;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -29,7 +30,7 @@ class ShedTest {
         jakr.setType("Jackhammer");
         jakr.setBrand("Ridgid");
         expected.setShed(Arrays.asList(chns, ladw, jakd, jakr));
-        Shed results = Shed.InitShed();
+        Shed results = ConfigReader.readConfig(Shed.FILE_NAME, Shed.class);
         assertEquals(expectedValues, results.toString(), String.format("expected: %s, actual: %s", expected, results));
     }
 }
