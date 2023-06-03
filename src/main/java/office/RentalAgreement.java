@@ -6,10 +6,13 @@ import shed.Tool;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class RentalAgreement {
     public static final String BAD_DISCOUNT_PERCENTAGE_MESSAGE = "the requested discount percentage (%d%%) must be between 0%% and 100%%";
     public static final String BAD_RENTAL_DAYS_MESSAGE = "the number of requested rental days (%d) must be greater than 0";
+
+    // independent values
     private final Tool tool;
     private final int rentalDays;
     private final LocalDate checkoutDate;
@@ -22,6 +25,7 @@ public class RentalAgreement {
     private double prediscountCharge;
     private double discountAmount;
     private double finalCharge;
+    private Charges charges;
 
     private static final ChargeSchedule chargeSchedule = ConfigReader.readConfig(ChargeSchedule.FILE_NAME, ChargeSchedule.class);
     private static final NumberFormat numberFormatter = NumberFormat.getCurrencyInstance();
@@ -51,7 +55,8 @@ public class RentalAgreement {
      */
     private void init() {
         dueDate = checkoutDate.plusDays(rentalDays);
-        dailyRentalCharge = chargeSchedule.getCharges(tool.getType()).getDaily_charge();
+        this.charges = chargeSchedule.getCharges(tool.getType());
+        dailyRentalCharge = charges.getDaily_charge();
         calcDaysCharged();
         prediscountCharge = daysCharged * dailyRentalCharge;
         discountAmount = roundToTwoDecimal(prediscountCharge * (double)discountPercent / 100);
@@ -59,13 +64,12 @@ public class RentalAgreement {
     }
 
     private double roundToTwoDecimal(double value) {
-        // TODO: verify this rounds the half up
         return (double) Math.round(value * 100.0) / 100.0;
     }
 
     private void calcDaysCharged() {
-        // TODO: implement date screening
-        daysCharged = rentalDays;
+        List<LocalDate> daysToCharge = CalendarEvaluator.daysToCharge(checkoutDate, rentalDays, charges.isCharge_weekends(), charges.isCharge_holidays());
+        daysCharged = daysToCharge.size();
     }
 
     public Tool getTool() {
