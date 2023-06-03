@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import shed.Shed;
 import shed.Tool;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -43,11 +44,11 @@ class RentalAgreementTest {
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
                 LocalDate.parse("07/05/20", dateFormatter),
-                1.99,
+                new BigDecimal("1.99"),
                 3, // July 4th falls on a Saturday, => not observed until Monday the 6th.
-                5.97,
-                .60,
-                5.37
+                new BigDecimal("5.97"),
+                new BigDecimal(".60"),
+                new BigDecimal("5.37")
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
@@ -75,11 +76,11 @@ class RentalAgreementTest {
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
                 LocalDate.parse("07/07/15", dateFormatter),
-                1.49,
+                new BigDecimal("1.49"),
                 3, // charge the weekend, but not the Monday
-                4.47,
-                1.12,
-                3.35
+                new BigDecimal("4.47"),
+                new BigDecimal("1.12"),
+                new BigDecimal("3.35")
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
@@ -107,11 +108,11 @@ class RentalAgreementTest {
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
                 LocalDate.parse("09/09/15", dateFormatter),
-                2.99,
+                new BigDecimal("2.99"),
                 3, // no charge over weekend, no charge on Monday (Labor day)
-                8.97,
-                0,
-                8.97
+                new BigDecimal("8.97"),
+                new BigDecimal("0.00"),
+                new BigDecimal("8.97")
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
@@ -139,11 +140,11 @@ class RentalAgreementTest {
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
                 LocalDate.parse("07/11/15", dateFormatter),
-                2.99,
+                new BigDecimal("2.99"),
                 5, // no charge over weekend, no charge on Monday (Labor day)
-                14.95,
-                0,
-                14.95
+                new BigDecimal("14.95"),
+                new BigDecimal("0.00"),
+                new BigDecimal("14.95")
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
@@ -171,11 +172,11 @@ class RentalAgreementTest {
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
                 LocalDate.parse("07/06/20", dateFormatter),
-                2.99,
+                new BigDecimal("2.99"),
                 1, // no charge over weekend, no charge on Monday (deferred 4th of July)
-                2.99,
-                1.50, // 1.495 rounding up!
-                1.49
+                new BigDecimal("2.99"),
+                new BigDecimal("1.50"), // 1.495 rounding up!
+                new BigDecimal("1.49")
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
@@ -205,13 +206,13 @@ class RentalAgreementTest {
         private final LocalDate checkoutDate;
         private final int discountPercent;
         private final LocalDate dueDate;
-        private final double dailyRentalCharge;
+        private final BigDecimal dailyRentalCharge;
         private final long daysCharged;
-        private final double prediscountCharge;
-        private final double discountAmount;
-        private final double finalCharge;
+        private final BigDecimal prediscountCharge;
+        private final BigDecimal discountAmount;
+        private final BigDecimal finalCharge;
 
-        public StaticValues(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent, LocalDate dueDate, double dailyRentalCharge, long daysCharged, double prediscountCharge, double discountAmount, double finalCharge) {
+        public StaticValues(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent, LocalDate dueDate, BigDecimal dailyRentalCharge, long daysCharged, BigDecimal prediscountCharge, BigDecimal discountAmount, BigDecimal finalCharge) {
             this.tool = tool;
             this.rentalDays = rentalDays;
             this.checkoutDate = checkoutDate;
@@ -244,7 +245,7 @@ class RentalAgreementTest {
             return dueDate;
         }
 
-        public double getDailyRentalCharge() {
+        public BigDecimal getDailyRentalCharge() {
             return dailyRentalCharge;
         }
 
@@ -252,15 +253,15 @@ class RentalAgreementTest {
             return daysCharged;
         }
 
-        public double getPrediscountCharge() {
+        public BigDecimal getPrediscountCharge() {
             return prediscountCharge;
         }
 
-        public double getDiscountAmount() {
+        public BigDecimal getDiscountAmount() {
             return discountAmount;
         }
 
-        public double getFinalCharge() {
+        public BigDecimal getFinalCharge() {
             return finalCharge;
         }
     }

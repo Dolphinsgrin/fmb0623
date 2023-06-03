@@ -3,6 +3,8 @@ package office;
 import config.ConfigReader;
 import shed.Tool;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,11 +22,11 @@ public class RentalAgreement {
 
     // calculated/evaluated values
     private LocalDate dueDate;
-    private double dailyRentalCharge;
+    private BigDecimal dailyRentalCharge;
     private long daysCharged;
-    private double prediscountCharge;
-    private double discountAmount;
-    private double finalCharge;
+    private BigDecimal prediscountCharge;
+    private BigDecimal discountAmount;
+    private BigDecimal finalCharge;
     private Charges charges;
 
     private static final ChargeSchedule chargeSchedule = ConfigReader.readConfig(ChargeSchedule.FILE_NAME, ChargeSchedule.class);
@@ -56,15 +58,11 @@ public class RentalAgreement {
     private void init() {
         dueDate = checkoutDate.plusDays(rentalDays);
         this.charges = chargeSchedule.getCharges(tool.getType());
-        dailyRentalCharge = charges.getDaily_charge();
+        dailyRentalCharge = BigDecimal.valueOf(charges.getDaily_charge());
         calcDaysCharged();
-        prediscountCharge = daysCharged * dailyRentalCharge;
-        discountAmount = roundToTwoDecimal(prediscountCharge * (double)discountPercent / 100);
-        finalCharge = roundToTwoDecimal(prediscountCharge - discountAmount);
-    }
-
-    private double roundToTwoDecimal(double value) {
-        return (double) Math.round(value * 100.0) / 100.0;
+        prediscountCharge = dailyRentalCharge.multiply(BigDecimal.valueOf(daysCharged));
+        discountAmount = prediscountCharge.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP);
+        finalCharge = prediscountCharge.subtract(discountAmount);
     }
 
     private void calcDaysCharged() {
@@ -88,7 +86,7 @@ public class RentalAgreement {
         return dueDate;
     }
 
-    public double getDailyRentalCharge() {
+    public BigDecimal getDailyRentalCharge() {
         return dailyRentalCharge;
     }
 
@@ -96,7 +94,7 @@ public class RentalAgreement {
         return daysCharged;
     }
 
-    public double getPrediscountCharge() {
+    public BigDecimal getPrediscountCharge() {
         return prediscountCharge;
     }
 
@@ -104,11 +102,11 @@ public class RentalAgreement {
         return discountPercent;
     }
 
-    public double getDiscountAmount() {
+    public BigDecimal getDiscountAmount() {
         return discountAmount;
     }
 
-    public double getFinalCharge() {
+    public BigDecimal getFinalCharge() {
         return finalCharge;
     }
 
