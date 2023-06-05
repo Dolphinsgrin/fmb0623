@@ -110,8 +110,9 @@ public class RentalAgreement {
         return finalCharge;
     }
 
-    public void printAgreement() {
-        String sb = "Tool code: " + tool.getCode() + "\n" +
+    public String printAgreement() {
+        String sb = "************************************\n" +
+                "Tool code: " + tool.getCode() + "\n" +
                 "Tool type: " + tool.getType() + "\n" +
                 "Tool brand: " + tool.getBrand() + "\n" +
                 "Rental days: " + rentalDays + "\n" +
@@ -124,5 +125,6 @@ public class RentalAgreement {
                 "Discount amount: " + numberFormatter.format(discountAmount) + "\n" +
                 "Final charge: " + numberFormatter.format(finalCharge);
         System.out.println(sb);
+        return sb;
     }
 }

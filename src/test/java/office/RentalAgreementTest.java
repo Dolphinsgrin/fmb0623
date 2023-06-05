@@ -52,9 +52,22 @@ class RentalAgreementTest {
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
-        underTest.printAgreement();
         // test the results
         validateScenario(underTest, expected);
+        assertEquals("""
+                ************************************
+                Tool code: LADW
+                Tool type: Ladder
+                Tool brand: Werner
+                Rental days: 3
+                Check out date: 07/02/20
+                Due date: 07/05/20
+                Daily rental charge: $1.99
+                Charge days: 3
+                Pre-discount charge: $5.97
+                Discount percent: 10%
+                Discount amount: $0.60
+                Final charge: $5.37""", underTest.printAgreement());
     }
 
     @Test
@@ -84,9 +97,22 @@ class RentalAgreementTest {
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
-        underTest.printAgreement();
         // test the results
         validateScenario(underTest, expected);
+        assertEquals("""
+                ************************************
+                Tool code: CHNS
+                Tool type: Chainsaw
+                Tool brand: Stihl
+                Rental days: 5
+                Check out date: 07/02/15
+                Due date: 07/07/15
+                Daily rental charge: $1.49
+                Charge days: 3
+                Pre-discount charge: $4.47
+                Discount percent: 25%
+                Discount amount: $1.12
+                Final charge: $3.35""", underTest.printAgreement());
     }
 
     @Test
@@ -116,9 +142,22 @@ class RentalAgreementTest {
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
-        underTest.printAgreement();
         // test the results
         validateScenario(underTest, expected);
+        assertEquals("""
+                ************************************
+                Tool code: JAKD
+                Tool type: Jackhammer
+                Tool brand: DeWalt
+                Rental days: 6
+                Check out date: 09/03/15
+                Due date: 09/09/15
+                Daily rental charge: $2.99
+                Charge days: 3
+                Pre-discount charge: $8.97
+                Discount percent: 0%
+                Discount amount: $0.00
+                Final charge: $8.97""", underTest.printAgreement());
     }
 
     @Test
@@ -148,9 +187,22 @@ class RentalAgreementTest {
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
-        underTest.printAgreement();
         // test the results
         validateScenario(underTest, expected);
+        assertEquals("""
+                ************************************
+                Tool code: JAKR
+                Tool type: Jackhammer
+                Tool brand: Ridgid
+                Rental days: 9
+                Check out date: 07/02/15
+                Due date: 07/11/15
+                Daily rental charge: $2.99
+                Charge days: 5
+                Pre-discount charge: $14.95
+                Discount percent: 0%
+                Discount amount: $0.00
+                Final charge: $14.95""", underTest.printAgreement());
     }
 
     @Test
@@ -180,9 +232,22 @@ class RentalAgreementTest {
         );
         // generate the rental agreement
         RentalAgreement underTest = new RentalAgreement(testShed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
-        underTest.printAgreement();
         // test the results
         validateScenario(underTest, expected);
+        assertEquals("""
+                ************************************
+                Tool code: JAKR
+                Tool type: Jackhammer
+                Tool brand: Ridgid
+                Rental days: 4
+                Check out date: 07/02/20
+                Due date: 07/06/20
+                Daily rental charge: $2.99
+                Charge days: 1
+                Pre-discount charge: $2.99
+                Discount percent: 50%
+                Discount amount: $1.50
+                Final charge: $1.49""", underTest.printAgreement());
     }
 
     void validateScenario(RentalAgreement input, StaticValues expected) {
