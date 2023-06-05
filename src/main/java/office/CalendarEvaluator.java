@@ -21,12 +21,11 @@ public class CalendarEvaluator {
      * @return the number of days to charge the daily rate for the tool rental
      */
     public static int calculateNumOfDaysToCharge(LocalDate checkoutDate, int numOfRentalDays, boolean isWeekendCharged, boolean isHolidayCharged) {
+        LocalDate endDate = checkoutDate.plusDays(numOfRentalDays);
         /* offsetting the date window by 1 to make start date exclusive and final date inclusive
         keeping the offsetting constrained to this class to avoid off-by-one issues elsewhere in code
          */
-        final LocalDate effectiveStartDate = checkoutDate.plusDays(1);
-        LocalDate endDate = effectiveStartDate.plusDays(numOfRentalDays);
-        return effectiveStartDate.datesUntil(endDate)
+        return checkoutDate.plusDays(1).datesUntil(endDate.plusDays(1))
                 // apply a weekend mask (if we're not charging for the weekends)
                 .filter(d -> {
                     if (isWeekendCharged) {
@@ -41,20 +40,20 @@ public class CalendarEvaluator {
                     if (isHolidayCharged) {
                         return true;
                     } else {
-                        return !getHolidaySet(effectiveStartDate, endDate).contains(d);
+                        return !getHolidaySet(checkoutDate, endDate).contains(d);
                     }
                 })
                 .toList().size();
     }
 
     private static Set<LocalDate> getHolidaySet(LocalDate startDate, LocalDate endDate) {
-        Set<LocalDate> holidaySet = findEffectiveJuly4ths(startDate.plusDays(1), endDate);
+        Set<LocalDate> holidaySet = findEffectiveJuly4ths(startDate, endDate);
         holidaySet.addAll(findLaborDays(startDate, endDate));
         return holidaySet;
     }
 
     public static Set<LocalDate> findEffectiveJuly4ths(LocalDate startDate, LocalDate endDate) {
-        return startDate.datesUntil(endDate)
+        return startDate.plusDays(1).datesUntil(endDate.plusDays(1))
                 .filter(d -> d.getMonth() == Month.JULY && d.getDayOfMonth() == 4)
                 /* Offsetting weekend occurrences of July 4th to the following Monday. This has the potential of pushing
                 the holiday past the dueDate, but as we're not checking past the due date it will ultimately be ignored */
@@ -72,7 +71,7 @@ public class CalendarEvaluator {
 
     public static Set<LocalDate> findLaborDays(LocalDate startDate, LocalDate endDate) {
         // identify the 1st Monday of September
-        return startDate.datesUntil(endDate)
+        return startDate.plusDays(1).datesUntil(endDate.plusDays(1))
                 .filter(d -> d.getMonth() == Month.SEPTEMBER)
                 .filter(d -> d.getDayOfWeek() == MONDAY)
                 .filter(d -> d.getDayOfMonth() <= 7)
