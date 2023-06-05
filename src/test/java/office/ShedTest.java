@@ -1,6 +1,5 @@
-package shed;
+package office;
 
-import config.ConfigReader;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -30,7 +29,7 @@ class ShedTest {
         jakr.setType("Jackhammer");
         jakr.setBrand("Ridgid");
         expected.setShed(Arrays.asList(chns, ladw, jakd, jakr));
-        Shed results = ConfigReader.readConfig(Shed.FILE_NAME, Shed.class);
+        Shed results = Shed.loadShed();
         assertEquals(expectedValues, results.toString(), String.format("expected: %s, actual: %s", expected, results));
     }
 }

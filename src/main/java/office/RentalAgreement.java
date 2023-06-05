@@ -1,14 +1,14 @@
 package office;
 
-import config.ConfigReader;
-import shed.Tool;
+import config.Common;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static config.Common.chargeSchedule;
+import static config.Common.numberFormatter;
 
 public class RentalAgreement {
     public static final String BAD_DISCOUNT_PERCENTAGE_MESSAGE = "the requested discount percentage (%d%%) must be between 0%% and 100%%";
@@ -23,15 +23,11 @@ public class RentalAgreement {
     // calculated/evaluated values
     private LocalDate dueDate;
     private BigDecimal dailyRentalCharge;
-    private long daysCharged;
-    private BigDecimal prediscountCharge;
+    private long calculatedDaysCharged;
+    private BigDecimal preDiscountCharge;
     private BigDecimal discountAmount;
     private BigDecimal finalCharge;
-    private Charges charges;
-
-    private static final ChargeSchedule chargeSchedule = ConfigReader.readConfig(ChargeSchedule.FILE_NAME, ChargeSchedule.class);
-    private static final NumberFormat numberFormatter = NumberFormat.getCurrencyInstance();
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+    private Charge toolCharge;
 
     public RentalAgreement(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException {
         validateInputs(rentalDays, discountPercent);
@@ -57,17 +53,17 @@ public class RentalAgreement {
      */
     private void init() {
         dueDate = checkoutDate.plusDays(rentalDays);
-        this.charges = chargeSchedule.getCharges(tool.getType());
-        dailyRentalCharge = BigDecimal.valueOf(charges.getDaily_charge());
+        toolCharge = chargeSchedule.getCharges(tool.getType());
+        dailyRentalCharge = BigDecimal.valueOf(toolCharge.getDaily_charge());
         calcDaysCharged();
-        prediscountCharge = dailyRentalCharge.multiply(BigDecimal.valueOf(daysCharged));
-        discountAmount = prediscountCharge.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP);
-        finalCharge = prediscountCharge.subtract(discountAmount);
+        preDiscountCharge = dailyRentalCharge.multiply(BigDecimal.valueOf(calculatedDaysCharged));
+        discountAmount = preDiscountCharge.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP);
+        finalCharge = preDiscountCharge.subtract(discountAmount);
     }
 
     private void calcDaysCharged() {
-        List<LocalDate> daysToCharge = CalendarEvaluator.daysToCharge(checkoutDate, rentalDays, charges.isCharge_weekends(), charges.isCharge_holidays());
-        daysCharged = daysToCharge.size();
+        List<LocalDate> daysToCharge = CalendarEvaluator.daysToCharge(checkoutDate, rentalDays, toolCharge.isCharge_weekends(), toolCharge.isCharge_holidays());
+        calculatedDaysCharged = daysToCharge.size();
     }
 
     public Tool getTool() {
@@ -90,12 +86,12 @@ public class RentalAgreement {
         return dailyRentalCharge;
     }
 
-    public long getDaysCharged() {
-        return daysCharged;
+    public long getCalculatedDaysCharged() {
+        return calculatedDaysCharged;
     }
 
-    public BigDecimal getPrediscountCharge() {
-        return prediscountCharge;
+    public BigDecimal getPreDiscountCharge() {
+        return preDiscountCharge;
     }
 
     public int getDiscountPercent() {
@@ -116,11 +112,11 @@ public class RentalAgreement {
                 "Tool type: " + tool.getType() + "\n" +
                 "Tool brand: " + tool.getBrand() + "\n" +
                 "Rental days: " + rentalDays + "\n" +
-                "Check out date: " + dateFormatter.format(checkoutDate) + "\n" +
-                "Due date: " + dateFormatter.format(dueDate) + "\n" +
+                "Check out date: " + Common.dateFormatter.format(checkoutDate) + "\n" +
+                "Due date: " + Common.dateFormatter.format(dueDate) + "\n" +
                 "Daily rental charge: " + numberFormatter.format(dailyRentalCharge) + "\n" +
-                "Charge days: " + daysCharged + "\n" +
-                "Pre-discount charge: " + numberFormatter.format(prediscountCharge) + "\n" +
+                "Charge days: " + calculatedDaysCharged + "\n" +
+                "Pre-discount charge: " + numberFormatter.format(preDiscountCharge) + "\n" +
                 "Discount percent: " + discountPercent + "%" + "\n" +
                 "Discount amount: " + numberFormatter.format(discountAmount) + "\n" +
                 "Final charge: " + numberFormatter.format(finalCharge);

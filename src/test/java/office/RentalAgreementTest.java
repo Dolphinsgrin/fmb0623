@@ -1,21 +1,17 @@
 package office;
 
-import config.ConfigReader;
 import org.junit.jupiter.api.Test;
-import shed.Shed;
-import shed.Tool;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
+import static config.Common.dateFormatter;
 import static office.RentalAgreement.BAD_DISCOUNT_PERCENTAGE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RentalAgreementTest {
-    static final Shed testShed = ConfigReader.readConfig(Shed.FILE_NAME, Shed.class);
-    static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+    static final Shed testShed = Shed.loadShed();
 
     @Test
     void test_challenge_proof_test1() {
@@ -259,8 +255,8 @@ class RentalAgreementTest {
         assertEquals(expected.getDiscountPercent(), input.getDiscountPercent(), "failed discount percent");
         assertEquals(expected.getDueDate(), input.getDueDate(), "failed due date");
         assertEquals(expected.getDailyRentalCharge(), input.getDailyRentalCharge(), "failed daily rental charge");
-        assertEquals(expected.getDaysCharged(), input.getDaysCharged(), "failed days charged");
-        assertEquals(expected.getPrediscountCharge(), input.getPrediscountCharge(), "failed pre-discount charge");
+        assertEquals(expected.getDaysCharged(), input.getCalculatedDaysCharged(), "failed days charged");
+        assertEquals(expected.getPrediscountCharge(), input.getPreDiscountCharge(), "failed pre-discount charge");
         assertEquals(expected.getDiscountAmount(), input.getDiscountAmount(), "failed discount amount");
         assertEquals(expected.getFinalCharge(), input.getFinalCharge(), "failed final charge");
     }

@@ -6,14 +6,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static config.Common.dateFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CalendarEvaluatorTest {
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
 
     @Test
     void daysToCharge() {

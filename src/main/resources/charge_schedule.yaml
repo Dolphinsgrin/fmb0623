@@ -1,4 +1,4 @@
-schedule:
+charges:
   - type: Ladder
     daily_charge: 1.99
     charge_weekdays: true

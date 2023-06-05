@@ -1,4 +1,4 @@
-package shed;
+package office;
 
 public class Tool {
     private String code;
