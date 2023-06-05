@@ -5,13 +5,11 @@ import config.Common;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.List;
 
-import static config.Common.chargeSchedule;
 import static config.Common.numberFormatter;
 
 public class RentalAgreement {
-    public static final String BAD_DISCOUNT_PERCENTAGE_MESSAGE = "the requested discount percentage (%d%%) must be between 0%% and 100%%";
+    public static final String BAD_DISCOUNT_PERCENTAGE_MESSAGE = "the requested discount percentage (%d) must be between 0 and 100";
     public static final String BAD_RENTAL_DAYS_MESSAGE = "the number of requested rental days (%d) must be greater than 0";
 
     // independent values
@@ -27,7 +25,6 @@ public class RentalAgreement {
     private BigDecimal preDiscountCharge;
     private BigDecimal discountAmount;
     private BigDecimal finalCharge;
-    private Charge toolCharge;
 
     public RentalAgreement(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException {
         validateInputs(rentalDays, discountPercent);
@@ -52,20 +49,15 @@ public class RentalAgreement {
      * before calculating the charge days or the daily charge rate will result in bad data.
      */
     private void init() {
+        // add the number of rental days to the checkout date to get dueDate
         dueDate = checkoutDate.plusDays(rentalDays);
-        toolCharge = chargeSchedule.getCharges(tool.getType());
-        dailyRentalCharge = BigDecimal.valueOf(toolCharge.getDaily_charge());
-        calcDaysCharged();
+        Charge toolCharge = ChargeSchedule.getChargeForType(tool.getType());
+        dailyRentalCharge = BigDecimal.valueOf(toolCharge.getDailyCharge());
+        calculatedDaysCharged = CalendarEvaluator.calculateNumOfDaysToCharge(checkoutDate, rentalDays, toolCharge.isWeekendCharged(), toolCharge.isHolidayCharged());
         preDiscountCharge = dailyRentalCharge.multiply(BigDecimal.valueOf(calculatedDaysCharged));
         discountAmount = preDiscountCharge.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP);
         finalCharge = preDiscountCharge.subtract(discountAmount);
     }
-
-    private void calcDaysCharged() {
-        List<LocalDate> daysToCharge = CalendarEvaluator.daysToCharge(checkoutDate, rentalDays, toolCharge.isCharge_weekends(), toolCharge.isCharge_holidays());
-        calculatedDaysCharged = daysToCharge.size();
-    }
-
     public Tool getTool() {
         return tool;
     }

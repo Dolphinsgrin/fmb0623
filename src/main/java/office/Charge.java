@@ -19,7 +19,7 @@ public class Charge {
         this.type = type;
     }
 
-    public double getDaily_charge() {
+    public double getDailyCharge() {
         return daily_charge;
     }
 
@@ -38,7 +38,7 @@ public class Charge {
         this.charge_weekdays = charge_weekdays;
     }
 
-    public boolean isCharge_weekends() {
+    public boolean isWeekendCharged() {
         return charge_weekends;
     }
 
@@ -47,7 +47,7 @@ public class Charge {
         this.charge_weekends = charge_weekends;
     }
 
-    public boolean isCharge_holidays() {
+    public boolean isHolidayCharged() {
         return charge_holidays;
     }
 
