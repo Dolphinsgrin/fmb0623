@@ -6,18 +6,40 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static config.Common.dateFormatter;
-import static office.RentalAgreement.BAD_DISCOUNT_PERCENTAGE_MESSAGE;
+import static config.Common.numberFormatter;
+import static office.Checkout.BAD_DISCOUNT_PERCENTAGE_MESSAGE;
+import static office.Checkout.BAD_RENTAL_DAYS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class RentalAgreementTest {
+class CheckoutTest {
+    @Test
+    void test_number_formatter_uses_commas() {
+        BigDecimal fourDigitNumber = BigDecimal.valueOf(9999.99D);
+        assertEquals("$9,999.99", numberFormatter.format(fourDigitNumber));
+    }
 
     @Test
-    void test_challenge_proof_test1() {
+    void test_dateFormatter_mm_dd_yy() {
+        LocalDate testDate = LocalDate.parse("01/31/23", dateFormatter);
+        assertEquals("01/31/23", testDate.format(dateFormatter));
+    }
+
+    @Test
+    void test_challenge_proof_test1a_bad_discount() {
         int badDiscountValue = 101;
         String expectedErrorMessage = String.format(BAD_DISCOUNT_PERCENTAGE_MESSAGE, badDiscountValue);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> new RentalAgreement(Shed.getTool("JAKR"), 5, LocalDate.parse("09/03/15", dateFormatter), badDiscountValue));
+                () -> new Checkout(Shed.getTool("JAKR"), 5, LocalDate.parse("09/03/15", dateFormatter), badDiscountValue));
+        assertEquals(e.getMessage(), expectedErrorMessage);
+    }
+
+    @Test
+    void test_challenge_proof_test1b_bad_rental_days() {
+        int badRentalDays = -3;
+        String expectedErrorMessage = String.format(BAD_RENTAL_DAYS_MESSAGE, badRentalDays);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> new Checkout(Shed.getTool("JAKR"), badRentalDays, LocalDate.parse("09/03/15", dateFormatter), 0));
         assertEquals(e.getMessage(), expectedErrorMessage);
     }
 
@@ -47,7 +69,7 @@ class RentalAgreementTest {
                 new BigDecimal("5.37")
         );
         // generate the rental agreement
-        RentalAgreement underTest = new RentalAgreement(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -63,7 +85,7 @@ class RentalAgreementTest {
                 Pre-discount charge: $5.97
                 Discount percent: 10%
                 Discount amount: $0.60
-                Final charge: $5.37""", underTest.printAgreement());
+                Final charge: $5.37""", underTest.printRentalAgreement());
     }
 
     @Test
@@ -92,7 +114,7 @@ class RentalAgreementTest {
                 new BigDecimal("3.35")
         );
         // generate the rental agreement
-        RentalAgreement underTest = new RentalAgreement(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -108,7 +130,7 @@ class RentalAgreementTest {
                 Pre-discount charge: $4.47
                 Discount percent: 25%
                 Discount amount: $1.12
-                Final charge: $3.35""", underTest.printAgreement());
+                Final charge: $3.35""", underTest.printRentalAgreement());
     }
 
     @Test
@@ -137,7 +159,7 @@ class RentalAgreementTest {
                 new BigDecimal("8.97")
         );
         // generate the rental agreement
-        RentalAgreement underTest = new RentalAgreement(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -153,7 +175,7 @@ class RentalAgreementTest {
                 Pre-discount charge: $8.97
                 Discount percent: 0%
                 Discount amount: $0.00
-                Final charge: $8.97""", underTest.printAgreement());
+                Final charge: $8.97""", underTest.printRentalAgreement());
     }
 
     @Test
@@ -182,7 +204,7 @@ class RentalAgreementTest {
                 new BigDecimal("14.95")
         );
         // generate the rental agreement
-        RentalAgreement underTest = new RentalAgreement(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -198,7 +220,7 @@ class RentalAgreementTest {
                 Pre-discount charge: $14.95
                 Discount percent: 0%
                 Discount amount: $0.00
-                Final charge: $14.95""", underTest.printAgreement());
+                Final charge: $14.95""", underTest.printRentalAgreement());
     }
 
     @Test
@@ -227,7 +249,7 @@ class RentalAgreementTest {
                 new BigDecimal("1.49")
         );
         // generate the rental agreement
-        RentalAgreement underTest = new RentalAgreement(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -243,10 +265,10 @@ class RentalAgreementTest {
                 Pre-discount charge: $2.99
                 Discount percent: 50%
                 Discount amount: $1.50
-                Final charge: $1.49""", underTest.printAgreement());
+                Final charge: $1.49""", underTest.printRentalAgreement());
     }
 
-    void validateScenario(RentalAgreement input, StaticValues expected) {
+    void validateScenario(Checkout input, StaticValues expected) {
         assertEquals(expected.getTool().getCode(), input.getTool().getCode(), "failed code");
         assertEquals(expected.getTool().getType(), input.getTool().getType(), "failed type");
         assertEquals(expected.getTool().getBrand(), input.getTool().getBrand(), "failed brand");

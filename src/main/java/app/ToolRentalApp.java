@@ -1,6 +1,6 @@
 package app;
 
-import office.RentalAgreement;
+import office.Checkout;
 import office.Shed;
 
 import java.time.LocalDate;
@@ -26,8 +26,8 @@ public class ToolRentalApp {
                 numOfDays = queryForInt(scanner, "Enter number of days the tool will be rented: ", 1, -1);
                 discountPercentage = queryForInt(scanner, "Enter discount percentage (as whole number): ", 0, 100);
                 checkoutDate = queryForCheckoutDate(scanner, "Enter checkout date (mm/dd/yy): ");
-                RentalAgreement ra = new RentalAgreement(Shed.getTool(code), numOfDays, checkoutDate, discountPercentage);
-                ra.printAgreement();
+                Checkout ra = new Checkout(Shed.getTool(code), numOfDays, checkoutDate, discountPercentage);
+                ra.printRentalAgreement();
                 System.out.println();
             }
         }

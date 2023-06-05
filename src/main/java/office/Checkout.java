@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 import static config.Common.numberFormatter;
 
-public class RentalAgreement {
+public class Checkout {
     public static final String BAD_DISCOUNT_PERCENTAGE_MESSAGE = "the requested discount percentage (%d) must be between 0 and 100";
     public static final String BAD_RENTAL_DAYS_MESSAGE = "the number of requested rental days (%d) must be greater than 0";
 
@@ -26,7 +26,7 @@ public class RentalAgreement {
     private BigDecimal discountAmount;
     private BigDecimal finalCharge;
 
-    public RentalAgreement(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException {
+    public Checkout(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException {
         validateInputs(rentalDays, discountPercent);
         this.tool = tool;
         this.rentalDays = rentalDays;
@@ -98,7 +98,7 @@ public class RentalAgreement {
         return finalCharge;
     }
 
-    public String printAgreement() {
+    public String printRentalAgreement() {
         String sb = "************************************\n" +
                 "Tool code: " + tool.getCode() + "\n" +
                 "Tool type: " + tool.getType() + "\n" +
