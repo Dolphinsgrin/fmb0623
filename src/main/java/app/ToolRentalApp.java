@@ -1,4 +1,4 @@
-package main;
+package app;
 
 import office.RentalAgreement;
 import office.Shed;
