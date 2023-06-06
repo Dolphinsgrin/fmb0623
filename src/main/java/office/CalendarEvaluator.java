@@ -53,6 +53,8 @@ public class CalendarEvaluator {
                     dateSet.computeIfPresent(key, (k, v) -> false);
                 }
             // mask Labor Day
+            } else if (key.getMonth() == Month.JULY && (key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
+                dateSet.computeIfPresent(key, (k, v) -> false);
             } else if (key.getMonth() == Month.SEPTEMBER && key.getDayOfWeek() == MONDAY && key.getDayOfMonth() <= 7) {
                 dateSet.computeIfPresent(key, (k, v) -> false);
             }
