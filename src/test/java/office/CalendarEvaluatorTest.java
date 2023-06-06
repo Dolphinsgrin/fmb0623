@@ -1,6 +1,5 @@
 package office;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,43 +12,32 @@ import static config.Common.dateFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CalendarEvaluatorTest {
-
-    @Test
-    void daysToCharge() {
-    }
-
-    @Test
-    void getHolidaySet() {
-    }
-
     /*
     start date -> end date => expected response
      */
-    private static Stream<Arguments> provideDatesForJuly4th() {
+    private static Stream<Arguments> provideDates() {
         return Stream.of(
                 // before the 4th, expect none
-                Arguments.of(LocalDate.parse("07/01/20", dateFormatter), LocalDate.parse("07/03/20", dateFormatter), Set.of()),
-                // after the 4th, expect none
-                Arguments.of(LocalDate.parse("07/05/20", dateFormatter), LocalDate.parse("07/08/20", dateFormatter), Set.of()),
+                Arguments.of(LocalDate.parse("07/01/20", dateFormatter), 2, 2),
+                // after the 4th, but 4th was on weekend... don't count the 6th!!
+                Arguments.of(LocalDate.parse("07/05/20", dateFormatter), 3, 2),
                 // falls on a Saturday, returns the following Monday
-                Arguments.of(LocalDate.parse("07/01/20", dateFormatter), LocalDate.parse("07/05/20", dateFormatter), Set.of(LocalDate.parse("07/06/20", dateFormatter))),
+                Arguments.of(LocalDate.parse("07/01/20", dateFormatter), 4, 2),
                 // falls on a Sunday, returns the following Monday
-                Arguments.of(LocalDate.parse("07/01/21", dateFormatter), LocalDate.parse("07/07/21", dateFormatter), Set.of(LocalDate.parse("07/05/21", dateFormatter))),
+                Arguments.of(LocalDate.parse("07/01/21", dateFormatter), 6, 3),
                 // falls on a Monday, returns itself
-                Arguments.of(LocalDate.parse("07/01/22", dateFormatter), LocalDate.parse("07/07/22", dateFormatter), Set.of(LocalDate.parse("07/04/22", dateFormatter))),
+                Arguments.of(LocalDate.parse("07/01/22", dateFormatter), 6, 3),
                 // ends on a Monday, returns itself
-                Arguments.of(LocalDate.parse("07/01/22", dateFormatter), LocalDate.parse("07/04/22", dateFormatter), Set.of(LocalDate.parse("07/04/22", dateFormatter))),
+                Arguments.of(LocalDate.parse("07/01/22", dateFormatter), 3, 0),
                 // starts on a Monday, ignores it
-                Arguments.of(LocalDate.parse("07/04/22", dateFormatter), LocalDate.parse("07/07/22", dateFormatter), Set.of()),
-                // spans more than a year, returns both, offset to Mondays
-                Arguments.of(LocalDate.parse("07/01/20", dateFormatter), LocalDate.parse("07/07/21", dateFormatter), Set.of(LocalDate.parse("07/06/20", dateFormatter), LocalDate.parse("07/05/21", dateFormatter)))
+                Arguments.of(LocalDate.parse("07/04/22", dateFormatter), 3, 3)
         );
     }
 
     @ParameterizedTest
-    @MethodSource("provideDatesForJuly4th")
-    void test_findEffectiveJuly4ths(LocalDate startDate, LocalDate endDate, Set<LocalDate> expected) {
-        assertEquals(expected, CalendarEvaluator.findEffectiveJuly4ths(startDate, endDate));
+    @MethodSource("provideDates")
+    void test_calculateNumOfDaysToCharge(LocalDate startDate, int numOfRentalDays, long expected) {
+        assertEquals(expected, CalendarEvaluator.calculateNumOfDaysToCharge(startDate, numOfRentalDays, false, false));
     }
 
     /*
@@ -72,11 +60,5 @@ class CalendarEvaluatorTest {
                 // spans more than a year, returns both
                 Arguments.of(LocalDate.parse("09/01/20", dateFormatter), LocalDate.parse("09/07/21", dateFormatter), Set.of(LocalDate.parse("09/07/20", dateFormatter), LocalDate.parse("09/06/21", dateFormatter)))
         );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideDatesForLaborDay")
-    void test_findLaborDays(LocalDate startDate, LocalDate endDate, Set<LocalDate> expected) {
-        assertEquals(expected, CalendarEvaluator.findLaborDays(startDate, endDate));
     }
 }

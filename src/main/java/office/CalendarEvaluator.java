@@ -1,10 +1,9 @@
 package office;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SATURDAY;
@@ -20,61 +19,43 @@ public class CalendarEvaluator {
      * @param isHolidayCharged whether rental fees are charged for holidays
      * @return the number of days to charge the daily rate for the tool rental
      */
-    public static int calculateNumOfDaysToCharge(LocalDate checkoutDate, int numOfRentalDays, boolean isWeekendCharged, boolean isHolidayCharged) {
+    public static long calculateNumOfDaysToCharge(LocalDate checkoutDate, int numOfRentalDays, boolean isWeekendCharged, boolean isHolidayCharged) {
         LocalDate endDate = checkoutDate.plusDays(numOfRentalDays);
+        Map<LocalDate, Boolean> datesFlaggedForCharge = new HashMap<>();
         /* offsetting the date window by 1 to make start date exclusive and final date inclusive
         keeping the offsetting constrained to this class to avoid off-by-one issues elsewhere in code
          */
-        return checkoutDate.plusDays(1).datesUntil(endDate.plusDays(1))
-                // apply a weekend mask (if we're not charging for the weekends)
-                .filter(d -> {
-                    if (isWeekendCharged) {
-                        return true;
-                    } else {
-                        Set<DayOfWeek> weekDaySet = Set.of(SATURDAY, SUNDAY);
-                        return !weekDaySet.contains(d.getDayOfWeek());
-                    }
-                })
-                // apply a holiday mask (if we're not charging for holidays)
-                .filter(d -> {
-                    if (isHolidayCharged) {
-                        return true;
-                    } else {
-                        return !getHolidaySet(checkoutDate, endDate).contains(d);
-                    }
-                })
-                .toList().size();
+        checkoutDate.plusDays(1).datesUntil(endDate.plusDays(1)).forEach(d -> datesFlaggedForCharge.put(d, true));
+        if (!isWeekendCharged) {
+            maskWeekends(datesFlaggedForCharge);
+        }
+        if (!isHolidayCharged) {
+            maskHolidays(datesFlaggedForCharge);
+        }
+        return datesFlaggedForCharge.entrySet().stream().filter(Map.Entry::getValue).count();
     }
 
-    private static Set<LocalDate> getHolidaySet(LocalDate startDate, LocalDate endDate) {
-        Set<LocalDate> holidaySet = findEffectiveJuly4ths(startDate, endDate);
-        holidaySet.addAll(findLaborDays(startDate, endDate));
-        return holidaySet;
+    private static void maskWeekends(final Map<LocalDate, Boolean> dateSet) {
+        dateSet.entrySet().stream()
+                .filter(es -> es.getKey().getDayOfWeek() == SATURDAY || es.getKey().getDayOfWeek() == SUNDAY)
+                .forEach(es -> dateSet.computeIfPresent(es.getKey(), (k, v) -> false));
     }
 
-    public static Set<LocalDate> findEffectiveJuly4ths(LocalDate startDate, LocalDate endDate) {
-        return startDate.plusDays(1).datesUntil(endDate.plusDays(1))
-                .filter(d -> d.getMonth() == Month.JULY && d.getDayOfMonth() == 4)
-                /* Offsetting weekend occurrences of July 4th to the following Monday. This has the potential of pushing
-                the holiday past the dueDate, but as we're not checking past the due date it will ultimately be ignored */
-                .map(d -> {
-                    if (d.getDayOfWeek() == SATURDAY) {
-                        return d.plusDays(2);
-                    }
-                    if (d.getDayOfWeek() == SUNDAY) {
-                        return d.plusDays(1);
-                    }
-                    return d;
-                })
-                .collect(Collectors.toSet());
-    }
-
-    public static Set<LocalDate> findLaborDays(LocalDate startDate, LocalDate endDate) {
-        // identify the 1st Monday of September
-        return startDate.plusDays(1).datesUntil(endDate.plusDays(1))
-                .filter(d -> d.getMonth() == Month.SEPTEMBER)
-                .filter(d -> d.getDayOfWeek() == MONDAY)
-                .filter(d -> d.getDayOfMonth() <= 7)
-                .collect(Collectors.toSet());
+    public static void maskHolidays(final Map<LocalDate, Boolean> dateSet) {
+        dateSet.forEach((key, value) -> {
+            // mask July 4ths
+            if (key.getMonth() == Month.JULY && key.getDayOfMonth() == 4) {
+                if (key.getDayOfWeek() == SATURDAY) {
+                    dateSet.computeIfPresent(key.plusDays(2), (k, v) -> false);
+                } else if (key.getDayOfWeek() == SUNDAY) {
+                    dateSet.computeIfPresent(key.plusDays(1), (k, v) -> false);
+                } else {
+                    dateSet.computeIfPresent(key, (k, v) -> false);
+                }
+            // mask Labor Day
+            } else if (key.getMonth() == Month.SEPTEMBER && key.getDayOfWeek() == MONDAY && key.getDayOfMonth() <= 7) {
+                dateSet.computeIfPresent(key, (k, v) -> false);
+            }
+        });
     }
 }
