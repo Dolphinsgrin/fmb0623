@@ -44,7 +44,7 @@ class CheckoutTest {
     }
 
     @Test
-    void test_challenge_proof_test2() {
+    void test_challenge_proof_test2() throws Exception {
         // test values
         String code = "LADW";
         int rentalDays = 3;
@@ -89,7 +89,7 @@ class CheckoutTest {
     }
 
     @Test
-    void test_challenge_proof_test3() {
+    void test_challenge_proof_test3() throws Exception {
         // test values
         String code = "CHNS";
         int rentalDays = 5;
@@ -134,7 +134,7 @@ class CheckoutTest {
     }
 
     @Test
-    void test_challenge_proof_test4() {
+    void test_challenge_proof_test4() throws Exception {
         // test values
         String code = "JAKD";
         int rentalDays = 6;
@@ -179,7 +179,7 @@ class CheckoutTest {
     }
 
     @Test
-    void test_challenge_proof_test5() {
+    void test_challenge_proof_test5() throws Exception {
         // test values
         String code = "JAKR";
         int rentalDays = 9;
@@ -224,7 +224,7 @@ class CheckoutTest {
     }
 
     @Test
-    void test_challenge_proof_test6() {
+    void test_challenge_proof_test6() throws Exception {
         // test values
         String code = "JAKR";
         int rentalDays = 4;
