@@ -9,7 +9,7 @@ import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 
-public class CalendarEvaluator {
+public class Holiday {
     /**
      * Returns the number of days to charge rental fees based on the checkout date, the number of days the rental is
      * requested, and whether to include weekends and/or holidays.
@@ -45,15 +45,9 @@ public class CalendarEvaluator {
         dateSet.forEach((key, value) -> {
             // mask July 4ths
             if (key.getMonth() == Month.JULY) {
-                if (key.getDayOfMonth() == 4) {
-                    if (key.getDayOfWeek() == SATURDAY) {
-                        dateSet.computeIfPresent(key.plusDays(2), (k, v) -> false);
-                    } else if (key.getDayOfWeek() == SUNDAY) {
-                        dateSet.computeIfPresent(key.plusDays(1), (k, v) -> false);
-                    } else {
-                        dateSet.computeIfPresent(key, (k, v) -> false);
-                    }
-                } else if ((key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
+                if ((key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
+                    dateSet.computeIfPresent(key, (k, v) -> false);
+                } else if (key.getDayOfMonth() == 4 && !(key.getDayOfWeek() == SATURDAY || key.getDayOfWeek() == SUNDAY)) {
                     dateSet.computeIfPresent(key, (k, v) -> false);
                 }
             // mask Labor Day

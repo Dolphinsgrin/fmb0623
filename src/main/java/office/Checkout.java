@@ -14,7 +14,7 @@ public class Checkout {
     public static final String BAD_RENTAL_DAYS_MESSAGE = "the number of requested rental days (%d) must be greater than 0";
 
     // independent values
-    private final Tool tool;
+    private final Tools.Tool tool;
     private final int rentalDays;
     private final LocalDate checkoutDate;
     private final int discountPercent;
@@ -27,7 +27,7 @@ public class Checkout {
     private BigDecimal discountAmount;
     private BigDecimal finalCharge;
 
-    public Checkout(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException, IOException {
+    public Checkout(Tools.Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException, IOException {
         validateInputs(rentalDays, discountPercent);
         this.tool = tool;
         this.rentalDays = rentalDays;
@@ -52,14 +52,14 @@ public class Checkout {
     private void init() throws IOException {
         // add the number of rental days to the checkout date to get dueDate
         dueDate = checkoutDate.plusDays(rentalDays);
-        Charge toolCharge = ChargeSchedule.getChargeForType(tool.getType());
+        ChargeSchedule.Charge toolCharge = ChargeSchedule.getChargeForType(tool.getType());
         dailyRentalCharge = BigDecimal.valueOf(toolCharge.getDailyCharge());
-        calculatedDaysCharged = CalendarEvaluator.calculateNumOfDaysToCharge(checkoutDate, rentalDays, toolCharge.isWeekendCharged(), toolCharge.isHolidayCharged());
+        calculatedDaysCharged = Holiday.calculateNumOfDaysToCharge(checkoutDate, rentalDays, toolCharge.isWeekendCharged(), toolCharge.isHolidayCharged());
         preDiscountCharge = dailyRentalCharge.multiply(BigDecimal.valueOf(calculatedDaysCharged));
         discountAmount = preDiscountCharge.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP);
         finalCharge = preDiscountCharge.subtract(discountAmount);
     }
-    public Tool getTool() {
+    public Tools.Tool getTool() {
         return tool;
     }
 

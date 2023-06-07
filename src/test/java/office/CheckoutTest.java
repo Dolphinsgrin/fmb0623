@@ -30,7 +30,7 @@ class CheckoutTest {
         int badDiscountValue = 101;
         String expectedErrorMessage = String.format(BAD_DISCOUNT_PERCENTAGE_MESSAGE, badDiscountValue);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> new Checkout(Shed.getTool("JAKR"), 5, LocalDate.parse("09/03/15", dateFormatter), badDiscountValue));
+                () -> new Checkout(Tools.getTool("JAKR"), 5, LocalDate.parse("09/03/15", dateFormatter), badDiscountValue));
         assertEquals(e.getMessage(), expectedErrorMessage);
     }
 
@@ -39,7 +39,7 @@ class CheckoutTest {
         int badRentalDays = -3;
         String expectedErrorMessage = String.format(BAD_RENTAL_DAYS_MESSAGE, badRentalDays);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> new Checkout(Shed.getTool("JAKR"), badRentalDays, LocalDate.parse("09/03/15", dateFormatter), 0));
+                () -> new Checkout(Tools.getTool("JAKR"), badRentalDays, LocalDate.parse("09/03/15", dateFormatter), 0));
         assertEquals(e.getMessage(), expectedErrorMessage);
     }
 
@@ -52,12 +52,10 @@ class CheckoutTest {
         int discountPercentage = 10;
 
         // explicitly build expected outputs
-        Tool expectedTool = new Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Werner");
-        expectedTool.setType("Ladder");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Ladder",
+                "Werner",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -69,7 +67,7 @@ class CheckoutTest {
                 new BigDecimal("5.37")
         );
         // generate the rental agreement
-        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Tools.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -97,12 +95,10 @@ class CheckoutTest {
         int discountPercentage = 25;
 
         // explicitly build expected outputs
-        Tool expectedTool = new Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Stihl");
-        expectedTool.setType("Chainsaw");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Chainsaw",
+                "Stihl",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -114,7 +110,7 @@ class CheckoutTest {
                 new BigDecimal("3.35")
         );
         // generate the rental agreement
-        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Tools.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -142,12 +138,10 @@ class CheckoutTest {
         int discountPercentage = 0;
 
         // explicitly build expected outputs
-        Tool expectedTool = new Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("DeWalt");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "DeWalt",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -159,7 +153,7 @@ class CheckoutTest {
                 new BigDecimal("8.97")
         );
         // generate the rental agreement
-        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Tools.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -187,12 +181,10 @@ class CheckoutTest {
         int discountPercentage = 0;
 
         // explicitly build expected outputs
-        Tool expectedTool = new Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Ridgid");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "Ridgid",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -204,7 +196,7 @@ class CheckoutTest {
                 new BigDecimal("14.95")
         );
         // generate the rental agreement
-        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Tools.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -232,12 +224,10 @@ class CheckoutTest {
         int discountPercentage = 50;
 
         // explicitly build expected outputs
-        Tool expectedTool = new Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Ridgid");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "Ridgid",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -249,7 +239,7 @@ class CheckoutTest {
                 new BigDecimal("1.49")
         );
         // generate the rental agreement
-        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Tools.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -269,7 +259,7 @@ class CheckoutTest {
     }
 
     @Test
-    void test_rental_starts_after_weekend_4th() {
+    void test_rental_starts_after_weekend_4th() throws Exception {
         // test values
         String code = "JAKR";
         int rentalDays = 3;
@@ -277,12 +267,10 @@ class CheckoutTest {
         int discountPercentage = 50;
 
         // explicitly build expected outputs
-        Tool expectedTool = new Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Ridgid");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "Ridgid",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -294,7 +282,7 @@ class CheckoutTest {
                 new BigDecimal("2.99")
         );
         // generate the rental agreement
-        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        Checkout underTest = new Checkout(Tools.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
         // test the results
         validateScenario(underTest, expected);
         assertEquals("""
@@ -314,9 +302,9 @@ class CheckoutTest {
     }
 
     void validateScenario(Checkout input, StaticValues expected) {
-        assertEquals(expected.getTool().getCode(), input.getTool().getCode(), "failed code");
-        assertEquals(expected.getTool().getType(), input.getTool().getType(), "failed type");
-        assertEquals(expected.getTool().getBrand(), input.getTool().getBrand(), "failed brand");
+        assertEquals(expected.getToolCode(), input.getTool().getCode(), "failed code");
+        assertEquals(expected.getToolType(), input.getTool().getType(), "failed type");
+        assertEquals(expected.getToolBrand(), input.getTool().getBrand(), "failed brand");
         assertEquals(expected.getRentalDays(), input.getRentalDays(), "failed rental days");
         assertEquals(expected.getCheckoutDate(), input.getCheckoutDate(), "failed checkout date");
         assertEquals(expected.getDiscountPercent(), input.getDiscountPercent(), "failed discount percent");
@@ -329,7 +317,9 @@ class CheckoutTest {
     }
 
     private static class StaticValues {
-        private final Tool tool;
+        private final String toolCode;
+        private final String toolType;
+        private final String toolBrand;
         private final int rentalDays;
         private final LocalDate checkoutDate;
         private final int discountPercent;
@@ -340,8 +330,10 @@ class CheckoutTest {
         private final BigDecimal discountAmount;
         private final BigDecimal finalCharge;
 
-        public StaticValues(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent, LocalDate dueDate, BigDecimal dailyRentalCharge, long daysCharged, BigDecimal prediscountCharge, BigDecimal discountAmount, BigDecimal finalCharge) {
-            this.tool = tool;
+        public StaticValues(String toolCode, String toolType, String toolBrand, int rentalDays, LocalDate checkoutDate, int discountPercent, LocalDate dueDate, BigDecimal dailyRentalCharge, long daysCharged, BigDecimal prediscountCharge, BigDecimal discountAmount, BigDecimal finalCharge) {
+            this.toolCode = toolCode;
+            this.toolType = toolType;
+            this.toolBrand = toolBrand;
             this.rentalDays = rentalDays;
             this.checkoutDate = checkoutDate;
             this.discountPercent = discountPercent;
@@ -353,8 +345,16 @@ class CheckoutTest {
             this.finalCharge = finalCharge;
         }
 
-        public Tool getTool() {
-            return tool;
+        public String getToolCode() {
+            return toolCode;
+        }
+
+        public String getToolType() {
+            return toolType;
+        }
+
+        public String getToolBrand() {
+            return toolBrand;
         }
 
         public int getRentalDays() {
