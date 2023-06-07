@@ -5,7 +5,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static config.Common.dateFormatter;
@@ -15,7 +14,7 @@ class CalendarEvaluatorTest {
     /*
     start date -> end date => expected response
      */
-    private static Stream<Arguments> provideDates() {
+    private static Stream<Arguments> provideDatesForJuly4th() {
         return Stream.of(
                 // before the 4th, expect none
                 Arguments.of(LocalDate.parse("07/01/20", dateFormatter), 2, 2),
@@ -34,31 +33,24 @@ class CalendarEvaluatorTest {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("provideDates")
-    void test_calculateNumOfDaysToCharge(LocalDate startDate, int numOfRentalDays, long expected) {
-        assertEquals(expected, CalendarEvaluator.calculateNumOfDaysToCharge(startDate, numOfRentalDays, false, false));
-    }
-
-    /*
-    start date -> end date => expected response
-     */
     private static Stream<Arguments> provideDatesForLaborDay() {
         return Stream.of(
                 // before the Labor Day, expect none
-                Arguments.of(LocalDate.parse("09/01/21", dateFormatter), LocalDate.parse("09/03/21", dateFormatter), Set.of()),
+                Arguments.of(LocalDate.parse("09/01/21", dateFormatter), 2, 2),
                 // after the Labor Day, expect none
-                Arguments.of(LocalDate.parse("09/07/21", dateFormatter), LocalDate.parse("09/21/21", dateFormatter), Set.of()),
-                // wrong month, expect none
-                Arguments.of(LocalDate.parse("07/07/21", dateFormatter), LocalDate.parse("07/21/21", dateFormatter), Set.of()),
+                Arguments.of(LocalDate.parse("09/07/21", dateFormatter), 14, 10),
                 // happy path
-                Arguments.of(LocalDate.parse("09/01/22", dateFormatter), LocalDate.parse("09/07/22", dateFormatter), Set.of(LocalDate.parse("09/05/22", dateFormatter))),
+                Arguments.of(LocalDate.parse("09/01/22", dateFormatter), 6, 3),
                 // ends on Labor day, finds it
-                Arguments.of(LocalDate.parse("09/01/22", dateFormatter), LocalDate.parse("09/05/22", dateFormatter), Set.of(LocalDate.parse("09/05/22", dateFormatter))),
+                Arguments.of(LocalDate.parse("09/01/22", dateFormatter), 4, 1),
                 // starts on Labor day, ignores it
-                Arguments.of(LocalDate.parse("09/05/22", dateFormatter), LocalDate.parse("09/07/22", dateFormatter), Set.of()),
-                // spans more than a year, returns both
-                Arguments.of(LocalDate.parse("09/01/20", dateFormatter), LocalDate.parse("09/07/21", dateFormatter), Set.of(LocalDate.parse("09/07/20", dateFormatter), LocalDate.parse("09/06/21", dateFormatter)))
+                Arguments.of(LocalDate.parse("09/05/22", dateFormatter), 2, 2)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource({"provideDatesForJuly4th", "provideDatesForLaborDay"})
+    void test_calculateNumOfDaysToCharge(LocalDate startDate, int numOfRentalDays, long expected) {
+        assertEquals(expected, CalendarEvaluator.calculateNumOfDaysToCharge(startDate, numOfRentalDays, false, false));
     }
 }

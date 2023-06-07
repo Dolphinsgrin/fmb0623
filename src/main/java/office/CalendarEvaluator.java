@@ -44,17 +44,19 @@ public class CalendarEvaluator {
     public static void maskHolidays(final Map<LocalDate, Boolean> dateSet) {
         dateSet.forEach((key, value) -> {
             // mask July 4ths
-            if (key.getMonth() == Month.JULY && key.getDayOfMonth() == 4) {
-                if (key.getDayOfWeek() == SATURDAY) {
-                    dateSet.computeIfPresent(key.plusDays(2), (k, v) -> false);
-                } else if (key.getDayOfWeek() == SUNDAY) {
-                    dateSet.computeIfPresent(key.plusDays(1), (k, v) -> false);
-                } else {
+            if (key.getMonth() == Month.JULY) {
+                if (key.getDayOfMonth() == 4) {
+                    if (key.getDayOfWeek() == SATURDAY) {
+                        dateSet.computeIfPresent(key.plusDays(2), (k, v) -> false);
+                    } else if (key.getDayOfWeek() == SUNDAY) {
+                        dateSet.computeIfPresent(key.plusDays(1), (k, v) -> false);
+                    } else {
+                        dateSet.computeIfPresent(key, (k, v) -> false);
+                    }
+                } else if ((key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
                     dateSet.computeIfPresent(key, (k, v) -> false);
                 }
             // mask Labor Day
-            } else if (key.getMonth() == Month.JULY && (key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
-                dateSet.computeIfPresent(key, (k, v) -> false);
             } else if (key.getMonth() == Month.SEPTEMBER && key.getDayOfWeek() == MONDAY && key.getDayOfMonth() <= 7) {
                 dateSet.computeIfPresent(key, (k, v) -> false);
             }
