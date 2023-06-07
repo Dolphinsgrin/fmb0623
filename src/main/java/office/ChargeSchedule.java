@@ -2,6 +2,7 @@ package office;
 
 import config.ConfigReader;
 
+import java.io.IOException;
 import java.util.List;
 
 /***
@@ -18,14 +19,14 @@ public class ChargeSchedule {
         this.charges = charges;
     }
 
-    private static ChargeSchedule loadChargeSchedule() {
+    private static ChargeSchedule loadChargeSchedule() throws IOException {
         if (chargeSchedule == null) {
             chargeSchedule = ConfigReader.readConfig(ChargeSchedule.FILE_NAME, ChargeSchedule.class);
         }
         return chargeSchedule;
     }
 
-    public static Charge getChargeForType(String type) {
+    public static Charge getChargeForType(String type) throws IOException {
         for (Charge charge : loadChargeSchedule().charges) {
             if (charge.getType().equals(type)) {
                 return charge;

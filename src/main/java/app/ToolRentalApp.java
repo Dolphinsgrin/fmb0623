@@ -3,6 +3,7 @@ package app;
 import office.Checkout;
 import office.Shed;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -30,6 +31,9 @@ public class ToolRentalApp {
                 ra.printRentalAgreement();
                 System.out.println();
             }
+        } catch (IOException e) {
+            System.out.println("Error: unable to load data file(s), unable to continue.");
+            System.exit(-1);
         }
     }
 
@@ -57,7 +61,7 @@ public class ToolRentalApp {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private static String queryForToolCode(Scanner scanner, String message) {
+    private static String queryForToolCode(Scanner scanner, String message) throws IOException {
         String code = null;
         while (code == null) {
             System.out.print(message);

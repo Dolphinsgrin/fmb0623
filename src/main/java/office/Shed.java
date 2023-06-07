@@ -2,6 +2,7 @@ package office;
 
 import config.ConfigReader;
 
+import java.io.IOException;
 import java.util.List;
 
 import static config.Common.definedExitCode;
@@ -19,7 +20,7 @@ public class Shed {
         return tools;
     }
 
-    private static Shed loadShed() {
+    private static Shed loadShed() throws IOException {
         if (shed == null) {
             shed = ConfigReader.readConfig(Shed.FILE_NAME, Shed.class);
             // quick validation that 'exit' is never added as a tool code in the future
@@ -32,7 +33,7 @@ public class Shed {
         return shed;
     }
 
-    public static Tool getTool(String code) throws IllegalArgumentException {
+    public static Tool getTool(String code) throws IllegalArgumentException, IOException {
         for (Tool tool : loadShed().tools) {
             if (tool.getCode().equals(code)) {
                 return tool;

@@ -2,6 +2,7 @@ package office;
 
 import config.Common;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -26,7 +27,7 @@ public class Checkout {
     private BigDecimal discountAmount;
     private BigDecimal finalCharge;
 
-    public Checkout(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException {
+    public Checkout(Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent) throws IllegalArgumentException, IOException {
         validateInputs(rentalDays, discountPercent);
         this.tool = tool;
         this.rentalDays = rentalDays;
@@ -48,7 +49,7 @@ public class Checkout {
      * The sequencing of the below actions are important. For example, attempting to calculate pre-discount charge
      * before calculating the charge days or the daily charge rate will result in bad data.
      */
-    private void init() {
+    private void init() throws IOException {
         // add the number of rental days to the checkout date to get dueDate
         dueDate = checkoutDate.plusDays(rentalDays);
         Charge toolCharge = ChargeSchedule.getChargeForType(tool.getType());
