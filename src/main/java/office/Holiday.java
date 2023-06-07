@@ -9,7 +9,7 @@ import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 
-public class CalendarEvaluator {
+public class Holiday {
     /**
      * Returns the number of days to charge rental fees based on the checkout date, the number of days the rental is
      * requested, and whether to include weekends and/or holidays.

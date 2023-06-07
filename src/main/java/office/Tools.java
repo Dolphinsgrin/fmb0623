@@ -10,27 +10,27 @@ import static config.Common.definedExitCode;
 /***
  * Used by YAML reader to create instance. Suppressing 'unused' warnings for setters.
  */
-public class Shed {
+public class Tools {
     private static final String FILE_NAME = "inventory.yaml";
     private static final String TOOL_CODE_EXIT_CONFLICT_MESSAGE = "cannot use %s as a tool code, conflicts with exit code";
     private List<Tool> tools;
-    private static Shed shed;
+    private static Tools toolsInstance;
 
     public List<Tool> getTools() {
         return tools;
     }
 
-    private static Shed loadShed() throws IOException {
-        if (shed == null) {
-            shed = ConfigReader.readConfig(Shed.FILE_NAME, Shed.class);
+    private static Tools loadShed() throws IOException {
+        if (toolsInstance == null) {
+            toolsInstance = ConfigReader.readConfig(Tools.FILE_NAME, Tools.class);
             // quick validation that 'exit' is never added as a tool code in the future
-            shed.getTools().forEach(t -> {
+            toolsInstance.getTools().forEach(t -> {
                 if (t.getCode().equals(definedExitCode)) {
                     throw new RuntimeException(String.format(TOOL_CODE_EXIT_CONFLICT_MESSAGE, definedExitCode));
                 }
             });
         }
-        return shed;
+        return toolsInstance;
     }
 
     public static Tool getTool(String code) throws IllegalArgumentException, IOException {
@@ -54,5 +54,40 @@ public class Shed {
             sb.append(tool);
         }
         return sb.toString();
+    }
+
+    public static class Tool {
+        private String code;
+        private String type;
+        private String brand;
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getBrand() {
+            return brand;
+        }
+
+        public void setBrand(String brand) {
+            this.brand = brand;
+        }
+
+        @Override
+        public String toString() {
+            return "Tool{" + "code='" + code + '\'' + ", type='" + type + '\'' + ", brand='" + brand + '\'' + '}';
+        }
     }
 }

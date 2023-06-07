@@ -1,7 +1,7 @@
 package app;
 
 import office.Checkout;
-import office.Shed;
+import office.Tools;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ public class ToolRentalApp {
                 numOfDays = queryForInt(scanner, "Enter number of days the tool will be rented: ", 1, -1);
                 discountPercentage = queryForInt(scanner, "Enter discount percentage (as whole number): ", 0, 100);
                 checkoutDate = queryForCheckoutDate(scanner, "Enter checkout date (mm/dd/yy): ");
-                Checkout ra = new Checkout(Shed.getTool(code), numOfDays, checkoutDate, discountPercentage);
+                Checkout ra = new Checkout(Tools.getTool(code), numOfDays, checkoutDate, discountPercentage);
                 ra.printRentalAgreement();
                 System.out.println();
             }
@@ -68,7 +68,7 @@ public class ToolRentalApp {
             code = scanner.nextLine();
             checkExit(code);
             try {
-                Shed.getTool(code);
+                Tools.getTool(code);
             } catch (IllegalArgumentException e) {
                 System.out.println("INVALID TOOL CODE, PLEASE TRY AGAIN");
                 code = null;

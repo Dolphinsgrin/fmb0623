@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import static config.Common.dateFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CalendarEvaluatorTest {
+class HolidayTest {
     /*
     start date -> end date => expected response
      */
@@ -51,6 +51,6 @@ class CalendarEvaluatorTest {
     @ParameterizedTest
     @MethodSource({"provideDatesForJuly4th", "provideDatesForLaborDay"})
     void test_calculateNumOfDaysToCharge(LocalDate startDate, int numOfRentalDays, long expected) {
-        assertEquals(expected, CalendarEvaluator.calculateNumOfDaysToCharge(startDate, numOfRentalDays, false, false));
+        assertEquals(expected, Holiday.calculateNumOfDaysToCharge(startDate, numOfRentalDays, false, false));
     }
 }
