@@ -268,6 +268,51 @@ class CheckoutTest {
                 Final charge: $1.49""", underTest.printRentalAgreement());
     }
 
+    @Test
+    void test_rental_starts_after_weekend_4th() {
+        // test values
+        String code = "JAKR";
+        int rentalDays = 3;
+        String checkoutDayString = "07/05/20";
+        int discountPercentage = 50;
+
+        // explicitly build expected outputs
+        Tool expectedTool = new Tool();
+        expectedTool.setCode(code);
+        expectedTool.setBrand("Ridgid");
+        expectedTool.setType("Jackhammer");
+        StaticValues expected = new StaticValues(
+                expectedTool,
+                rentalDays,
+                LocalDate.parse(checkoutDayString, dateFormatter),
+                discountPercentage,
+                LocalDate.parse("07/08/20", dateFormatter),
+                new BigDecimal("2.99"),
+                2, // no charge on Monday (deferred 4th of July)
+                new BigDecimal("5.98"),
+                new BigDecimal("2.99"), // 1.495 rounding up!
+                new BigDecimal("2.99")
+        );
+        // generate the rental agreement
+        Checkout underTest = new Checkout(Shed.getTool(code), rentalDays, LocalDate.parse(checkoutDayString, dateFormatter), discountPercentage);
+        // test the results
+        validateScenario(underTest, expected);
+        assertEquals("""
+                ************************************
+                Tool code: JAKR
+                Tool type: Jackhammer
+                Tool brand: Ridgid
+                Rental days: 3
+                Check out date: 07/05/20
+                Due date: 07/08/20
+                Daily rental charge: $2.99
+                Charge days: 2
+                Pre-discount charge: $5.98
+                Discount percent: 50%
+                Discount amount: $2.99
+                Final charge: $2.99""", underTest.printRentalAgreement());
+    }
+
     void validateScenario(Checkout input, StaticValues expected) {
         assertEquals(expected.getTool().getCode(), input.getTool().getCode(), "failed code");
         assertEquals(expected.getTool().getType(), input.getTool().getType(), "failed type");
