@@ -45,15 +45,9 @@ public class Holiday {
         dateSet.forEach((key, value) -> {
             // mask July 4ths
             if (key.getMonth() == Month.JULY) {
-                if (key.getDayOfMonth() == 4) {
-                    if (key.getDayOfWeek() == SATURDAY) {
-                        dateSet.computeIfPresent(key.plusDays(2), (k, v) -> false);
-                    } else if (key.getDayOfWeek() == SUNDAY) {
-                        dateSet.computeIfPresent(key.plusDays(1), (k, v) -> false);
-                    } else {
-                        dateSet.computeIfPresent(key, (k, v) -> false);
-                    }
-                } else if ((key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
+                if ((key.getDayOfMonth() == 5 || key.getDayOfMonth() == 6) && key.getDayOfWeek() == MONDAY) {
+                    dateSet.computeIfPresent(key, (k, v) -> false);
+                } else if (key.getDayOfMonth() == 4 && !(key.getDayOfWeek() == SATURDAY || key.getDayOfWeek() == SUNDAY)) {
                     dateSet.computeIfPresent(key, (k, v) -> false);
                 }
             // mask Labor Day
