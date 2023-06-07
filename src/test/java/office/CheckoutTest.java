@@ -52,12 +52,10 @@ class CheckoutTest {
         int discountPercentage = 10;
 
         // explicitly build expected outputs
-        Tools.Tool expectedTool = new Tools.Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Werner");
-        expectedTool.setType("Ladder");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Ladder",
+                "Werner",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -97,12 +95,10 @@ class CheckoutTest {
         int discountPercentage = 25;
 
         // explicitly build expected outputs
-        Tools.Tool expectedTool = new Tools.Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Stihl");
-        expectedTool.setType("Chainsaw");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Chainsaw",
+                "Stihl",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -142,12 +138,10 @@ class CheckoutTest {
         int discountPercentage = 0;
 
         // explicitly build expected outputs
-        Tools.Tool expectedTool = new Tools.Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("DeWalt");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "DeWalt",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -187,12 +181,10 @@ class CheckoutTest {
         int discountPercentage = 0;
 
         // explicitly build expected outputs
-        Tools.Tool expectedTool = new Tools.Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Ridgid");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "Ridgid",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -232,12 +224,10 @@ class CheckoutTest {
         int discountPercentage = 50;
 
         // explicitly build expected outputs
-        Tools.Tool expectedTool = new Tools.Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Ridgid");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "Ridgid",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -277,12 +267,10 @@ class CheckoutTest {
         int discountPercentage = 50;
 
         // explicitly build expected outputs
-        Tools.Tool expectedTool = new Tools.Tool();
-        expectedTool.setCode(code);
-        expectedTool.setBrand("Ridgid");
-        expectedTool.setType("Jackhammer");
         StaticValues expected = new StaticValues(
-                expectedTool,
+                code,
+                "Jackhammer",
+                "Ridgid",
                 rentalDays,
                 LocalDate.parse(checkoutDayString, dateFormatter),
                 discountPercentage,
@@ -314,9 +302,9 @@ class CheckoutTest {
     }
 
     void validateScenario(Checkout input, StaticValues expected) {
-        assertEquals(expected.getTool().getCode(), input.getTool().getCode(), "failed code");
-        assertEquals(expected.getTool().getType(), input.getTool().getType(), "failed type");
-        assertEquals(expected.getTool().getBrand(), input.getTool().getBrand(), "failed brand");
+        assertEquals(expected.getToolCode(), input.getTool().getCode(), "failed code");
+        assertEquals(expected.getToolType(), input.getTool().getType(), "failed type");
+        assertEquals(expected.getToolBrand(), input.getTool().getBrand(), "failed brand");
         assertEquals(expected.getRentalDays(), input.getRentalDays(), "failed rental days");
         assertEquals(expected.getCheckoutDate(), input.getCheckoutDate(), "failed checkout date");
         assertEquals(expected.getDiscountPercent(), input.getDiscountPercent(), "failed discount percent");
@@ -329,7 +317,9 @@ class CheckoutTest {
     }
 
     private static class StaticValues {
-        private final Tools.Tool tool;
+        private final String toolCode;
+        private final String toolType;
+        private final String toolBrand;
         private final int rentalDays;
         private final LocalDate checkoutDate;
         private final int discountPercent;
@@ -340,8 +330,10 @@ class CheckoutTest {
         private final BigDecimal discountAmount;
         private final BigDecimal finalCharge;
 
-        public StaticValues(Tools.Tool tool, int rentalDays, LocalDate checkoutDate, int discountPercent, LocalDate dueDate, BigDecimal dailyRentalCharge, long daysCharged, BigDecimal prediscountCharge, BigDecimal discountAmount, BigDecimal finalCharge) {
-            this.tool = tool;
+        public StaticValues(String toolCode, String toolType, String toolBrand, int rentalDays, LocalDate checkoutDate, int discountPercent, LocalDate dueDate, BigDecimal dailyRentalCharge, long daysCharged, BigDecimal prediscountCharge, BigDecimal discountAmount, BigDecimal finalCharge) {
+            this.toolCode = toolCode;
+            this.toolType = toolType;
+            this.toolBrand = toolBrand;
             this.rentalDays = rentalDays;
             this.checkoutDate = checkoutDate;
             this.discountPercent = discountPercent;
@@ -353,8 +345,16 @@ class CheckoutTest {
             this.finalCharge = finalCharge;
         }
 
-        public Tools.Tool getTool() {
-            return tool;
+        public String getToolCode() {
+            return toolCode;
+        }
+
+        public String getToolType() {
+            return toolType;
+        }
+
+        public String getToolBrand() {
+            return toolBrand;
         }
 
         public int getRentalDays() {

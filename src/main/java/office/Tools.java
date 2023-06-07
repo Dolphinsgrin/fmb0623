@@ -20,7 +20,7 @@ public class Tools {
         return tools;
     }
 
-    private static Tools loadShed() throws IOException {
+    private static Tools loadTools() throws IOException {
         if (toolsInstance == null) {
             toolsInstance = ConfigReader.readConfig(Tools.FILE_NAME, Tools.class);
             // quick validation that 'exit' is never added as a tool code in the future
@@ -34,7 +34,7 @@ public class Tools {
     }
 
     public static Tool getTool(String code) throws IllegalArgumentException, IOException {
-        for (Tool tool : loadShed().tools) {
+        for (Tool tool : loadTools().tools) {
             if (tool.getCode().equals(code)) {
                 return tool;
             }
@@ -65,6 +65,7 @@ public class Tools {
             return code;
         }
 
+        @SuppressWarnings("unused")
         public void setCode(String code) {
             this.code = code;
         }
@@ -73,6 +74,7 @@ public class Tools {
             return type;
         }
 
+        @SuppressWarnings("unused")
         public void setType(String type) {
             this.type = type;
         }
@@ -81,6 +83,7 @@ public class Tools {
             return brand;
         }
 
+        @SuppressWarnings("unused")
         public void setBrand(String brand) {
             this.brand = brand;
         }
